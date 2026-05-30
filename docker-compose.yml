@@ -1,11 +1,23 @@
+version: "3.9"
+
 services:
   fastapi:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
+
+    container_name: bed-detector-api
+
     ports:
       - "8080:8080"
+
     volumes:
-      - ./src:/app/src
+      - ./src:/app/src          # hot reload código
+      - ./models:/app/models    # acceso al modelo
+    #- ./data:/app/data        # (opcional) datos
+
     environment:
       - PYTHONUNBUFFERED=1
+      - MODEL_PATH=/app/models/resnet18.pth
+
+    restart: unless-stopped

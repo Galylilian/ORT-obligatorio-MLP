@@ -1,181 +1,210 @@
-# Práctico 4: Model Serving - Clasificación de Imágenes
-
-##  Descripción
-
-En este práctico se implementa un sistema de clasificación de imágenes utilizando modelos pre-entrenados de Hugging Face Transformers y FastAPI para servir predicciones mediante una API REST.
-
-El sistema permite recibir imágenes en formato de URL y devolver una predicción junto con su score de confianza.
-
----
-
-## Tecnologías utilizadas
-
-- Python 3.10
-- FastAPI
-- Hugging Face Transformers
-- Torch
-- Docker & Docker Compose
-- Pillow (procesamiento de imágenes)
-
----
-
-## Modelo utilizado
-
-- **Nombre:** `google/vit-base-patch16-224`
-- **Tipo:** Vision Transformer (ViT)
-- **Parámetros:** ~86 millones
-- **Ventajas:**
-  - Buen rendimiento en CPU
-  - Precisión alta en clasificación de imágenes
-  - Liviano comparado con modelos más grandes
-
----
-
-## Cómo ejecutar el proyecto
-
-docker-compose up --build
-
-## Acceder a la API
-
-http://localhost:8080/docs
-
-##  Inputs:
-Lista de URLs de imágenes:
-[
-  "https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/cats.png"
-]
-
-
-Response:
-{
-  "images": [
-    {
-      "image_url": "https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/cats.png",
-      "label": "tabby, tabby cat",
-      "score": 0.27686887979507446,
-      "metadata": {
-        "top_k": [
-          {
-            "label": "tabby, tabby cat",
-            "score": 0.27686887979507446
-          },
-          {
-            "label": "tiger cat",
-            "score": 0.2763679027557373
-          },
-          {
-            "label": "Egyptian cat",
-            "score": 0.1402817666530609
-          },
-          {
-            "label": "hay",
-            "score": 0.025314634665846825
-          },
-          {
-            "label": "wool, woolen, woollen",
-            "score": 0.019932912662625313
-          }
-        ]
-      }
-    }
-  ],
-  "model_id": "google/vit-base-patch16-224",
-  "inference_time": 1.6842601299285889
-}
+obligatorio/
+│
+├── data/                         # Dataset (NO subir a GitHub)
+│   ├── raw/                      # dataset original de Roboflow
+│   ├── processed/                # dataset convertido a clasificación
+│   │   ├── train/
+│   │   │   ├── acostado/
+│   │   │   └── no_acostado/
+│   │   ├── valid/
+│   │   └── test/
+│
+├── models/                       # Modelos entrenados
+│   ├── resnet18.pth
+│
+├── notebooks/                    # EDA y experimentación
+│   └── eda.ipynb                 # falta hacerlo
+│
+├── scripts/                      # Scripts auxiliares
+│   ├── download_dataset.py       # descarga Roboflow
+│   ├── convert_dataset.py        # convierte a clasificación
+│
+├── src/                          # Código fuente principal
+│
+│   ├── api/                      # API (FastAPI)
+│   │   ├── routers/
+│   │   │   ├── predict.py        # endpoint CNN
+│   │   │   └── predict_yolo.py   # endpoint YOLO
+│   │   └── app.py                # integración FastAPI
+│
+│   ├── core/                     # Lógica ML
+│   │   ├── model.py              # ResNet18
+│   │   ├── train.py              # revisar mejorar
+│   │   ├── evaluate.py
+│   │   ├── yolo_model.py         # baseline YOLO
+│   │   ├── gradcam.py            # explicabilidad
+│   │
+│   ├── preprocessing/            # Transformaciones
+│   │   └── transforms.py         # falta mejorarlo
+│
+│   ├── data/                     # Carga de datos
+│   │   └── dataset.py
+│
+│   ├── utils/                    # Utilidades
+│   │   ├── metrics.py
+│   │   └── logger.py
+│
+│   ├── settings/                 # Configuración
+│   │   └── config.py             # aca esta el modelo a utilizar y OS
+│
+├── app/                          # UI (Streamlit)
+│   └── streamlit_app.py          # este es el frontend
+│
+├── tests/                        # Tests
+│   └── test_api.py
+│
+├── Dockerfile
+├── docker-compose.yml
+├── requirements.txt
+├── README.md
+└── .gitignore
 
 
 
+# Hospital Bed Detector
+
+## Problema
+Clasificación binaria para detectar si un paciente está acostado.
+
+## Modelos
+- CNN ResNet18 (modelo de clasificacion)
+- YOLO baseline (modelo de deteccion)
+
+## API
+- /predict
+- /predict_yolo
+
+## Run en local
+
+pip install -r requirements.txt
+python src/core/train.py
+uvicorn src.api.app:app --reload
 
 
 
-[
-  "https://images.dog.ceo/breeds/retriever-golden/n02099601_3004.jpg"
-]
+# Pasos
+
+#offline 
+1. pip install -r requirements.txt
+2. python scripts/download_dataset.py
+3. python scripts/convert_dataset.py
+4. python -m src.core.train
+
+download → convert → train → evaluate
+
+#Produccion
+5. docker-compose up --build 
+
+API (FastAPI)
+
+
+#TEST
+6. python -m src.core.evaluate
+7. python scripts/compare_models.py
+
+# front
+8. streamlit run app/streamlit_app.py
+
+El sistema se compone de:
+
+un pipeline offline de entrenamiento,
+una API para inferencia en producción,
+un script para evaluación comparativa,
+y una interfaz de usuario con Streamlit para interacción con el modelo.
+
+# en sistemas de ML en producción, el entrenamiento y la inferencia suelen separarse. El entrenamiento es costoso y se ejecuta offline, mientras que la API en producción debe ser ligera, rápida y estable.
 
 
 
-Response: 
 
-{
-  "images": [
-    {
-      "image_url": "https://images.dog.ceo/breeds/retriever-golden/n02099601_3004.jpg",
-      "label": "golden retriever",
-      "score": 0.9684914350509644,
-      "metadata": {
-        "top_k": [
-          {
-            "label": "golden retriever",
-            "score": 0.9684914350509644
-          },
-          {
-            "label": "Sussex spaniel",
-            "score": 0.0063134147785604
-          },
-          {
-            "label": "Labrador retriever",
-            "score": 0.004907520953565836
-          },
-          {
-            "label": "Irish setter, red setter",
-            "score": 0.0015904484316706657
-          },
-          {
-            "label": "clumber, clumber spaniel",
-            "score": 0.0014749923720955849
-          }
-        ]
-      }
-    }
-  ],
-  "model_id": "google/vit-base-patch16-224",
-  "inference_time": 0.6940145492553711
-}
+train.py → crea modelo ✅
+model.py → define modelo ✅
+gradcam.py → explica ✅
+API → usa modelo ✅
+Streamlit → usa API ✅
 
 
 
-[
-  "https://raw.githubusercontent.com/pytorch/hub/master/images/deeplab1.png"
-]
+Pipeline completo
+  ┌───────────────────────┐
+                │   ROBFLOW DATASET     │
+                │ (imágenes + labels)   │
+                └──────────┬────────────┘
+                           │
+                           ▼
+                ┌───────────────────────┐
+                │ download_dataset.py   │
+                │ (descarga dataset)    │
+                └──────────┬────────────┘
+                           │
+                           ▼
+                ┌───────────────────────┐
+                │   data/raw            │
+                │ (formato YOLO)        │
+                └──────────┬────────────┘
+                           │
+                           ▼
+                ┌───────────────────────┐
+                │ convert_dataset.py    │
+                │ (detección → clases)  │
+                └──────────┬────────────┘
+                           │
+                           ▼
+                ┌───────────────────────┐
+                │ data/processed        │
+                │ (ImageFolder ready)   │
+                └──────────┬────────────┘
+                           │
+                           ▼
+                ┌───────────────────────┐
+                │    train.py           │
+                │ (entrena ResNet18)    │
+                └──────────┬────────────┘
+                           │
+                           ▼
+                ┌───────────────────────┐
+                │ models/resnet18.pth   │
+                │ (modelo final)        │
+                └──────────┬────────────┘
 
+Produccion 
 
-Response:
+  ┌───────────────────────┐
+                │ docker-compose up     │
+                │ (levanta API)         │
+                └──────────┬────────────┘
+                           │
+                           ▼
+                ┌───────────────────────┐
+                │    FastAPI API        │
+                │  (src/api/app.py)     │
+                └──────────┬────────────┘
+                           │
+        ┌──────────────────┼──────────────────┐
+        ▼                  ▼                  ▼
+┌───────────────┐  ┌───────────────┐  ┌───────────────┐
+│  /predict     │  │ /predict_yolo │  │  /gradcam     │
+│  CNN model    │  │ YOLO model    │  │ GradCAM       │
+└───────┬───────┘  └───────┬───────┘  └───────┬───────┘
+        │                  │                  │
+        ▼                  ▼                  ▼
+   model.py         YOLO model         gradcam.py
+   (ResNet18)       baseline           explicación
 
-{
-  "images": [
-    {
-      "image_url": "https://raw.githubusercontent.com/pytorch/hub/master/images/deeplab1.png",
-      "label": "kelpie",
-      "score": 0.22587624192237854,
-      "metadata": {
-        "top_k": [
-          {
-            "label": "kelpie",
-            "score": 0.22587624192237854
-          },
-          {
-            "label": "ram, tup",
-            "score": 0.11406498402357101
-          },
-          {
-            "label": "Cardigan, Cardigan Welsh corgi",
-            "score": 0.0906381756067276
-          },
-          {
-            "label": "collie",
-            "score": 0.04332457855343819
-          },
-          {
-            "label": "Border collie",
-            "score": 0.030792642384767532
-          }
-        ]
-      }
-    }
-  ],
-  "model_id": "google/vit-base-patch16-224",
-  "inference_time": 1.8521
-}
-
-
-
+Visualizacion
+                ┌───────────────────────┐
+                │   Streamlit App       │
+                │  (src/app/...)        │
+                └──────────┬────────────┘
+                           │
+                           ▼
+                (envía imagen a API)
+                           │
+                           ▼
+          ┌──────────────────────────────────┐
+          │       RESULTADOS MOSTRADOS       │
+          │                                  │
+          │ ✅ CNN predicción                │
+          │ ✅ YOLO predicción               │
+          │ ✅ GradCAM (heatmap)             │
+          └──────────────────────────────────┘

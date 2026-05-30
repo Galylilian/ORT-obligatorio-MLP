@@ -1,30 +1,34 @@
 # Use the official Python image as base
 FROM python:3.11-slim
 
-# Set environment variables
+# Variables de entorno
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONPATH=/app
 
-# Set the working directory in the container
+# Directorio de trabajo
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        gcc \
-        g++ \
-        && rm -rf /var/lib/apt/lists/*
+# Dependencias del sistema (para PyTorch, OpenCV, etc.)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    g++ \
+    libgl1 \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
-COPY ./requirements.txt /app/
+# Copiar requirements
+COPY requirements.txt /app/
+
+# Instalar dependencias Python
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the application code into the container
-COPY . /app
+# Copiar el código
+COPY src ./src
+COPY models ./models
 
-# Expose port 8080 to the outside world
+# Exponer puerto
 EXPOSE 8080
 
-# Command to run the application
-CMD ["python", "-m", "src.api.app"]
+# Comando para correr FastAPI correctamente
+CMD ["uvicorn", "src.api.app:app", "--host", "0.0.0.0", "--port", "8080"]
