@@ -1,0 +1,181 @@
+# Práctico 4: Model Serving - Clasificación de Imágenes
+
+##  Descripción
+
+En este práctico se implementa un sistema de clasificación de imágenes utilizando modelos pre-entrenados de Hugging Face Transformers y FastAPI para servir predicciones mediante una API REST.
+
+El sistema permite recibir imágenes en formato de URL y devolver una predicción junto con su score de confianza.
+
+---
+
+## Tecnologías utilizadas
+
+- Python 3.10
+- FastAPI
+- Hugging Face Transformers
+- Torch
+- Docker & Docker Compose
+- Pillow (procesamiento de imágenes)
+
+---
+
+## Modelo utilizado
+
+- **Nombre:** `google/vit-base-patch16-224`
+- **Tipo:** Vision Transformer (ViT)
+- **Parámetros:** ~86 millones
+- **Ventajas:**
+  - Buen rendimiento en CPU
+  - Precisión alta en clasificación de imágenes
+  - Liviano comparado con modelos más grandes
+
+---
+
+## Cómo ejecutar el proyecto
+
+docker-compose up --build
+
+## Acceder a la API
+
+http://localhost:8080/docs
+
+##  Inputs:
+Lista de URLs de imágenes:
+[
+  "https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/cats.png"
+]
+
+
+Response:
+{
+  "images": [
+    {
+      "image_url": "https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/cats.png",
+      "label": "tabby, tabby cat",
+      "score": 0.27686887979507446,
+      "metadata": {
+        "top_k": [
+          {
+            "label": "tabby, tabby cat",
+            "score": 0.27686887979507446
+          },
+          {
+            "label": "tiger cat",
+            "score": 0.2763679027557373
+          },
+          {
+            "label": "Egyptian cat",
+            "score": 0.1402817666530609
+          },
+          {
+            "label": "hay",
+            "score": 0.025314634665846825
+          },
+          {
+            "label": "wool, woolen, woollen",
+            "score": 0.019932912662625313
+          }
+        ]
+      }
+    }
+  ],
+  "model_id": "google/vit-base-patch16-224",
+  "inference_time": 1.6842601299285889
+}
+
+
+
+
+
+
+[
+  "https://images.dog.ceo/breeds/retriever-golden/n02099601_3004.jpg"
+]
+
+
+
+Response: 
+
+{
+  "images": [
+    {
+      "image_url": "https://images.dog.ceo/breeds/retriever-golden/n02099601_3004.jpg",
+      "label": "golden retriever",
+      "score": 0.9684914350509644,
+      "metadata": {
+        "top_k": [
+          {
+            "label": "golden retriever",
+            "score": 0.9684914350509644
+          },
+          {
+            "label": "Sussex spaniel",
+            "score": 0.0063134147785604
+          },
+          {
+            "label": "Labrador retriever",
+            "score": 0.004907520953565836
+          },
+          {
+            "label": "Irish setter, red setter",
+            "score": 0.0015904484316706657
+          },
+          {
+            "label": "clumber, clumber spaniel",
+            "score": 0.0014749923720955849
+          }
+        ]
+      }
+    }
+  ],
+  "model_id": "google/vit-base-patch16-224",
+  "inference_time": 0.6940145492553711
+}
+
+
+
+[
+  "https://raw.githubusercontent.com/pytorch/hub/master/images/deeplab1.png"
+]
+
+
+Response:
+
+{
+  "images": [
+    {
+      "image_url": "https://raw.githubusercontent.com/pytorch/hub/master/images/deeplab1.png",
+      "label": "kelpie",
+      "score": 0.22587624192237854,
+      "metadata": {
+        "top_k": [
+          {
+            "label": "kelpie",
+            "score": 0.22587624192237854
+          },
+          {
+            "label": "ram, tup",
+            "score": 0.11406498402357101
+          },
+          {
+            "label": "Cardigan, Cardigan Welsh corgi",
+            "score": 0.0906381756067276
+          },
+          {
+            "label": "collie",
+            "score": 0.04332457855343819
+          },
+          {
+            "label": "Border collie",
+            "score": 0.030792642384767532
+          }
+        ]
+      }
+    }
+  ],
+  "model_id": "google/vit-base-patch16-224",
+  "inference_time": 1.8521
+}
+
+
+
