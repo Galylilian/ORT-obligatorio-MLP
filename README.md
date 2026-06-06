@@ -29,7 +29,7 @@ obligatorio/
 │
 │   ├── core/                     # Lógica ML
 │   │   ├── model.py              # ResNet18
-│   │   ├── train.py              # revisar mejorar
+│   │   ├── train.py              # revisar mejorar,cambiar la cantidad de epochs
 │   │   ├── evaluate.py
 │   │   ├── yolo_model.py         # baseline YOLO
 │   │   ├── gradcam.py            # explicabilidad
@@ -51,7 +51,7 @@ obligatorio/
 │   └── streamlit_app.py          # este es el frontend
 │
 ├── tests/                        # Tests
-│   └── test_api.py
+│   └── test_api.py               # esto hay que adecuarlo
 │
 ├── Dockerfile
 ├── docker-compose.yml
@@ -73,6 +73,7 @@ Clasificación binaria para detectar si un paciente está acostado.
 ## API
 - /predict
 - /predict_yolo
+- /gradcam
 
 ## Run en local
 
@@ -94,6 +95,7 @@ download → convert → train → evaluate
 
 #Produccion
 5. docker-compose up --build 
+#Para detener el docker docker-compose down -v
 
 API (FastAPI)
 

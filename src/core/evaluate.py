@@ -25,7 +25,6 @@ def evaluate(model, loader):
             y_pred.extend(preds.cpu().numpy())
 
     print(classification_report(y_true, y_pred))
-
     
 metrics = compute_metrics(y_true, y_pred)
 print(metrics)
